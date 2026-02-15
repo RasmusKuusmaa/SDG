@@ -7,8 +7,8 @@ networkCanvas.width =300;
 const carctx = carcanvas.getContext("2d");
 const networkCtx = networkCanvas.getContext("2d");
 
-
-const road= new Road(carcanvas.width/2, carcanvas.width * 0.9);
+const LANE_COUNT = 4;
+const road= new Road(carcanvas.width/2, carcanvas.width * 0.9, LANE_COUNT);
 const cars = generateCars(100);
 
 let bestcar = cars[0];
@@ -18,9 +18,26 @@ if (localStorage.getItem("bestBrain")) {
     )
 }
 
-const traffic =[
-    new Car(road.getLaneCenter(1), -100, 30,50, "DUMMY")
-];
+const traffic = generateTraffic();
+
+function generateTraffic(){
+    const t = [];
+    const rows = 50;
+    const spacing = 150;
+    for (let i = 0; i < rows; i++){
+        const lanes = Array.from({length: LANE_COUNT}, (_, i) => i);
+        const count = Math.floor(Math.random()*(LANE_COUNT-1))+1;
+        for (let j = lanes.length-1; j > 0; j--){
+            const k = Math.floor(Math.random()*(j+1));
+            [lanes[j], lanes[k]] = [lanes[k], lanes[j]];
+        }
+        const chosen = lanes.slice(0, count);
+        for (const lane of chosen){
+            t.push(new Car(road.getLaneCenter(lane), -100 - i*spacing, 30, 50, "DUMMY", 2));
+        }
+    }
+    return t;
+}
 
 animate();
 
@@ -35,7 +52,7 @@ function discard() {
 }
 function generateCars(N){
     const cars =[];
-    for (let i=1;i<N;i++){
+    for (let i=0;i<N;i++){
         cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 6));
     }
     return cars;

@@ -12,6 +12,7 @@ class Car {
     this.friction = 0.05;
     this.angle = 0;
     this.damaged = false;
+    this.polygon = this.#createPolygon();
 
     this.useBrain = controlType == "AI";
 
