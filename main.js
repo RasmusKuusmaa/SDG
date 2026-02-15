@@ -10,16 +10,33 @@ const networkCtx = networkCanvas.getContext("2d");
 
 const road= new Road(carcanvas.width/2, carcanvas.width * 0.9);
 const cars = generateCars(100);
+
+let bestcar = cars[0];
+if (localStorage.getItem("bestBrain")) {
+    bestcar.brain=JSON.parse(
+        localStorage.getItem("bestBrain")
+    )
+}
+
 const traffic =[
     new Car(road.getLaneCenter(1), -100, 30,50, "DUMMY")
 ];
 
 animate();
 
+function save(){
+    localStorage.setItem("bestBrain",
+        JSON.stringify(bestCar.brain)
+    )
+}
+
+function discard() {
+    localStorage.removeItem("bestBrain");
+}
 function generateCars(N){
     const cars =[];
     for (let i=1;i<N;i++){
-        cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, "AI"));
+        cars.push(new Car(road.getLaneCenter(1), 100, 30, 50, "AI", 6));
     }
     return cars;
 }
@@ -32,7 +49,7 @@ function animate(time){
     for (let i =0; i< cars.length;i++){
         cars[i].update(road.borders, traffic);
     }
-    const bestCar = cars.find(
+    bestCar = cars.find(
         c => c.y == Math.min(
             ...cars.map(c=>c.y)
         )
